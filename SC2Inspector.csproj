@@ -55,6 +55,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="MPQLogic\MPQArchive.cs" />
+    <Compile Include="MPQLogic\MPQEntry.cs" />
+    <Compile Include="MPQLogic\MPQHash.cs" />
+    <Compile Include="MPQLogic\MPQHashTable.cs" />
+    <Compile Include="MPQLogic\MPQHeader.cs" />
+    <Compile Include="MPQLogic\MPQUtilities.cs" />
+    <Compile Include="ReplayLogic\Replay.cs" />
+    <Compile Include="ViewModel\ReplayViewModel.cs" />
+    <Compile Include="ViewModel\InspectorViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -93,6 +102,7 @@
     </None>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

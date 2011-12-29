@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.Windows;
+using SC2Inspector.ViewModel;
 
 namespace SC2Inspector {
 	/// <summary>
@@ -16,7 +17,7 @@ namespace SC2Inspector {
 		/// <param name="e">Startup Arguments</param>
 		protected override void OnStartup(StartupEventArgs e) {
 			base.OnStartup(e);
-			MainWindow MainWindow = new MainWindow();
+			MainWindow MainWindow = new MainWindow(new InspectorViewModel());
 			MainWindow.Show();
 		}
 	}
