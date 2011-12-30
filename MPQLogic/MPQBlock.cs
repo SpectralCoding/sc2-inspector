@@ -47,12 +47,6 @@ namespace SC2Inspector.MPQLogic {
 		/// <param name="BlockSize">Size of each block of data. Should always be 4096.</param>
 		public void PopulateFileContents(BinaryReader BinaryReader, uint BlockSize) {
 			BinaryReader.BaseStream.Seek(FilePos, SeekOrigin.Begin);
-			if (IsCompressed && !IsSingleUnit) {
-				// Come back to this when we need to deal with files which meet the following:
-				//     File is split into sectors rather than stored as a single unit.
-				// Edit: No SC2 replay files are split up this way.
-				LoadBlockPositions(BinaryReader, BlockSize);
-			}
 			CompressedContents = BinaryReader.ReadBytes(Convert.ToInt32(CompressedSize));
 			RawContents = Decompress(FileSize);
 		}
@@ -90,36 +84,5 @@ namespace SC2Inspector.MPQLogic {
 			return Decompressed;
 		}
 
-		/// <summary>
-		/// For multi-locationed files this enumerates the block locations of each piece. Not in use.
-		/// </summary>
-		/// <param name="BinaryReader">BinaryReader used to manipulate the data stream.</param>
-		/// <param name="BlockSize">Size of each block of data. Should always be 4096.</param>
-		public void LoadBlockPositions(BinaryReader BinaryReader, uint BlockSize) {
-			// This method shouldn't actually be necessary for SC2Replays but i'll leave it here because it is done.
-			uint BlockPositionSize;
-			int BlockPositionCount = Convert.ToInt32((FileSize + BlockSize - 1) / BlockSize) + 1;
-			// Files with metadata have an extra block containing block checksums
-			if ((Flags & MPQFileFlags.FileHasMetadata) != 0) {
-				BlockPositionCount++;
-			}
-			BlockPositions = new uint[BlockPositionCount];
-			BinaryReader.BaseStream.Seek(FilePos, SeekOrigin.Begin);
-			for (int i = 0; i < BlockPositionCount; i++) {
-				BlockPositions[i] = BinaryReader.ReadUInt32();
-			}
-			BlockPositionSize = Convert.ToUInt32(BlockPositionCount * 4);
-			if (IsEncrypted) {
-				if (EncryptionSeed == 0) {
-					EncryptionSeed = MPQUtilities.DetectFileSeed(BlockPositions[0], BlockPositions[1], BlockPositionSize) + 1;
-					if (EncryptionSeed == 1) {
-						throw new Exception("Unable to determine encryption seed.");
-					}
-				}
-				MPQUtilities.DecryptBlock(BlockPositions, EncryptionSeed - 1);
-				if (BlockPositions[0] != BlockPositionSize) { throw new Exception("Decryption Failed."); }
-				if (BlockPositions[1] > (BlockSize + BlockPositionSize)) { throw new Exception("Decryption Failed."); }
-			}
-		}
 	}
 }
