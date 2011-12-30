@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 
 namespace SC2Inspector.MPQLogic {
 
@@ -79,6 +80,28 @@ namespace SC2Inspector.MPQLogic {
 			return result;
 		}
 
+		public static int ParseVLFNumber(BinaryReader reader) {
+			var bytes = 0;
+			var first = true;
+			var number = 0;
+			var multiplier = 1;
+			while (true) {
+				var i = reader.ReadByte();
+				number += (i & 0x7F) * (int)Math.Pow(2, bytes * 7);
+				if (first) {
+					if ((number & 1) != 0) {
+						multiplier = -1;
+						number--;
+					}
+					first = false;
+				}
+				if ((i & 0x80) == 0) {
+					break;
+				}
+				bytes++;
+			}
+			return (number / 2) * multiplier;
+		}
 
 
 	}

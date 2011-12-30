@@ -56,7 +56,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="MPQLogic\MPQArchive.cs" />
-    <Compile Include="MPQLogic\MPQEntry.cs" />
+    <Compile Include="MPQLogic\MPQBlock.cs" />
+    <Compile Include="MPQLogic\MPQBlockTable.cs" />
     <Compile Include="MPQLogic\MPQHash.cs" />
     <Compile Include="MPQLogic\MPQHashTable.cs" />
     <Compile Include="MPQLogic\MPQHeader.cs" />

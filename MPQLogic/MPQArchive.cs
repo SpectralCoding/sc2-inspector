@@ -9,7 +9,7 @@ namespace SC2Inspector.MPQLogic {
 		private Stream m_BaseStream;
 		private MPQHeader m_MPQHeader;
 		private MPQHashTable m_MPQHashTable;
-		private List<MPQEntry> m_MPQBlockTable;
+		private MPQBlockTable m_MPQBlockTable;
 
 		public MPQArchive(string Filename) {
 			m_BaseStream = File.Open(Filename, FileMode.Open, FileAccess.Read);
@@ -21,13 +21,13 @@ namespace SC2Inspector.MPQLogic {
 			BinaryReader BinaryReader = new BinaryReader(m_BaseStream);
 			m_MPQHashTable = GetMPQHashTable(BinaryReader);
 			m_MPQBlockTable = GetMPQBlockTable(BinaryReader);
-			GetListFile(BinaryReader);
+			GetFile("(listfile)", BinaryReader);
 		}
 
-		public void GetListFile(BinaryReader BinaryReader) {
+		public void GetFile(string Filename, BinaryReader BinaryReader) {
 			BinaryReader.BaseStream.Seek(0, SeekOrigin.Begin);
-			MPQHash ListFileHash = m_MPQHashTable.GetHashByFilename("(listfile)");
-			// Next step is to figure out how to get the data out of the file. The listfile is compressed (See MPQExtractor).
+			MPQHash ListFileHash = m_MPQHashTable.GetHashByFilename(Filename);
+			MPQBlock ListFileEntry = (MPQBlock)m_MPQBlockTable[ListFileHash.BlockIndex];
 		}
 
 		public MPQHeader GetMPQHeader() {
@@ -43,17 +43,10 @@ namespace SC2Inspector.MPQLogic {
 			return new MPQHashTable(HashTableRawData, Convert.ToInt32(m_MPQHeader.HashTableSize));
 		}
 
-		public List<MPQEntry> GetMPQBlockTable(BinaryReader BinaryReader) {
-			List<MPQEntry> returnLst = new List<MPQEntry>();
+		public MPQBlockTable GetMPQBlockTable(BinaryReader BinaryReader) {
 			m_BaseStream.Seek(m_MPQHeader.BlockTablePos, SeekOrigin.Begin);
 			byte[] BlockTableRawData = BinaryReader.ReadBytes(Convert.ToInt32(m_MPQHeader.BlockTableSize) * 16);
-			BinaryReader DecryptedBinaryReader = new BinaryReader(new MemoryStream(BlockTableRawData));
-			MPQEntry MPQEntryObj;
-			for (int i = 0; i < m_MPQHeader.BlockTableSize; i++) {
-				MPQEntryObj = new MPQEntry(DecryptedBinaryReader, m_MPQHeader.HeaderOffset);
-				returnLst.Add(MPQEntryObj);
-			}
-			return returnLst;
+			return new MPQBlockTable(BlockTableRawData, Convert.ToInt32(m_MPQHeader.BlockTableSize), m_MPQHeader.HeaderOffset);
 		}
 
 	}

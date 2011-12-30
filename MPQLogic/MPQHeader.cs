@@ -43,19 +43,19 @@ namespace SC2Inspector.MPQLogic {
 				HeaderOffset = BinaryReader.ReadUInt32();
 				UserDataSize = BinaryReader.ReadUInt32();
 				int DataType = BinaryReader.ReadByte();							// Should be 0x05 (Array with Keys)
-				int NumberOfElements = ParseVLFNumber(BinaryReader);
-				int Index = ParseVLFNumber(BinaryReader);
+				int NumberOfElements = MPQUtilities.ParseVLFNumber(BinaryReader);
+				int Index = MPQUtilities.ParseVLFNumber(BinaryReader);
 				DataType = BinaryReader.ReadByte();								// Should be 0x2 (Binary Data)
-				NumberOfElements = ParseVLFNumber(BinaryReader);
+				NumberOfElements = MPQUtilities.ParseVLFNumber(BinaryReader);
 				StarCraftII = BinaryReader.ReadBytes(NumberOfElements);
-				Index = ParseVLFNumber(BinaryReader);
+				Index = MPQUtilities.ParseVLFNumber(BinaryReader);
 				DataType = BinaryReader.ReadByte();
-				NumberOfElements = ParseVLFNumber(BinaryReader);
+				NumberOfElements = MPQUtilities.ParseVLFNumber(BinaryReader);
 				int[] Version = new int[NumberOfElements];
 				while (NumberOfElements > 0) {
-					Index = ParseVLFNumber(BinaryReader);
+					Index = MPQUtilities.ParseVLFNumber(BinaryReader);
 					DataType = BinaryReader.ReadByte();
-					if (DataType == 0x09) { Version[Index] = ParseVLFNumber(BinaryReader); }
+					if (DataType == 0x09) { Version[Index] = MPQUtilities.ParseVLFNumber(BinaryReader); }
 					else if (DataType == 0x06) { Version[Index] = BinaryReader.ReadByte(); }
 					else if (DataType == 0x07) { Version[Index] = BitConverter.ToInt32(BinaryReader.ReadBytes(4), 0); }
 					NumberOfElements--;
@@ -91,68 +91,5 @@ namespace SC2Inspector.MPQLogic {
 			}
 		}
 
-		/*
-		public Dictionary<int, object> ParseSerializedData(BinaryReader BinaryReader) {
-			Dictionary<int, object> returnLst = new Dictionary<int, object>();
-			Byte DataType = BinaryReader.ReadByte();
-			int NumberOfElements;
-			switch (DataType) {
-				case 0x02:
-					returnLst.Add(returnLst.Count - 1, ParseVLFNumber(BinaryReader));
-					return returnLst;
-				case 0x04:
-					BinaryReader.ReadBytes(2);
-					NumberOfElements = ParseVLFNumber(BinaryReader);
-					while (NumberOfElements > 0) {
-						returnLst.Add(returnLst.Count - 1, ParseSerializedData(BinaryReader));
-						NumberOfElements--;
-					}
-					return returnLst;
-				case 0x05:
-					NumberOfElements = ParseVLFNumber(BinaryReader);
-					while (NumberOfElements > 0) {
-						int index = ParseVLFNumber(BinaryReader);
-						returnLst.Add(index, ParseSerializedData(BinaryReader));
-						NumberOfElements--;
-					}
-					return returnLst;
-				case 0x06:
-					returnLst.Add(returnLst.Count - 1, BinaryReader.ReadByte());
-					return returnLst;
-				case 0x07:
-					returnLst.Add(returnLst.Count - 1, BinaryReader.ReadUInt32());
-					return returnLst;
-				case 0x09:
-					returnLst.Add(returnLst.Count - 1, ParseVLFNumber(BinaryReader));
-					return returnLst;
-				default:
-					throw new Exception("Unknown DataType!");
-			}
-			return returnLst;
-		}
-		*/
-
-		private static int ParseVLFNumber(BinaryReader reader) {
-			var bytes = 0;
-			var first = true;
-			var number = 0;
-			var multiplier = 1;
-			while (true) {
-				var i = reader.ReadByte();
-				number += (i & 0x7F) * (int)Math.Pow(2, bytes * 7);
-				if (first) {
-					if ((number & 1) != 0) {
-						multiplier = -1;
-						number--;
-					}
-					first = false;
-				}
-				if ((i & 0x80) == 0) {
-					break;
-				}
-				bytes++;
-			}
-			return (number / 2) * multiplier;
-		}
 	}
 }
