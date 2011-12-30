@@ -10,9 +10,12 @@ namespace SC2Inspector.MPQLogic {
 		public uint Name2 { get; private set; }
 		public uint Locale { get; private set; }
 		public uint BlockIndex { get; private set; }
-
 		public static readonly uint Size = 16;
 
+		/// <summary>
+		/// Initializes and retrieves data pretaining the an entry in the MPQ Hash Table.
+		/// </summary>
+		/// <param name="DecryptedBinaryReader">BinaryReader containing decryped Hashtable information.</param>
 		public MPQHash(BinaryReader DecryptedBinaryReader) {
 			Name1 = DecryptedBinaryReader.ReadUInt32();
 			Name2 = DecryptedBinaryReader.ReadUInt32();

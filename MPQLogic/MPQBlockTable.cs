@@ -8,11 +8,17 @@ using System.IO;
 namespace SC2Inspector.MPQLogic {
 	class MPQBlockTable : Hashtable {
 
-		public MPQBlockTable(byte[] i_BlockTableData, int i_BlockTableSize, uint i_HeaderOffset) {
-			MPQUtilities.DecryptTable(i_BlockTableData, "(block table)");
-			BinaryReader DecryptedBinaryReader = new BinaryReader(new MemoryStream(i_BlockTableData));
-			for (uint i = 0; i < i_BlockTableSize; i++) {
-				MPQBlock MPQBlockObj = new MPQBlock(DecryptedBinaryReader, i_HeaderOffset);
+		/// <summary>
+		/// Initializes and populates the MPQ Block Table.
+		/// </summary>
+		/// <param name="BlockTableData">Byte array containing the raw block table data.</param>
+		/// <param name="BlockTableSize">Number of blocks in the array. Byte size should actually be this value multiplied by 16.</param>
+		/// <param name="HeaderOffset">Offset of the header. Should always be 1024.</param>
+		public MPQBlockTable(byte[] BlockTableData, int BlockTableSize, uint HeaderOffset) {
+			MPQUtilities.DecryptTable(BlockTableData, "(block table)");
+			BinaryReader DecryptedBinaryReader = new BinaryReader(new MemoryStream(BlockTableData));
+			for (uint i = 0; i < BlockTableSize; i++) {
+				MPQBlock MPQBlockObj = new MPQBlock(DecryptedBinaryReader, HeaderOffset);
 				this[i] = MPQBlockObj;
 			}
 		}

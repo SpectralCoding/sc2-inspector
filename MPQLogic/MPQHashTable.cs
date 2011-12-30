@@ -8,16 +8,25 @@ using System.IO;
 namespace SC2Inspector.MPQLogic {
 	class MPQHashTable : Hashtable {
 
-		public MPQHashTable(byte[] i_HashTableData, int i_HashTableSize) {
-			MPQUtilities.DecryptTable(i_HashTableData, "(hash table)");
-			BinaryReader DecryptedBinaryReader = new BinaryReader(new MemoryStream(i_HashTableData));
-			for (int i = 0; i < i_HashTableSize; i++) {
+		/// <summary>
+		/// Initializes and populates the MPQ Hash Table
+		/// </summary>
+		/// <param name="HashTableData">Byte array containing the raw hash table data.</param>
+		/// <param name="HashTableSize">Number of hashes in the array. Byte size should actually be this value multiplied by 16.</param>
+		public MPQHashTable(byte[] HashTableData, int HashTableSize) {
+			MPQUtilities.DecryptTable(HashTableData, "(hash table)");
+			BinaryReader DecryptedBinaryReader = new BinaryReader(new MemoryStream(HashTableData));
+			for (int i = 0; i < HashTableSize; i++) {
 				MPQHash MPQHashObj = new MPQHash(DecryptedBinaryReader);
 				this[i] = MPQHashObj;
-				//Console.WriteLine("{0} - {1} - {2} - {3}", MPQHashObj.BlockIndex, MPQHashObj.Locale, MPQHashObj.Name1, MPQHashObj.Name2);
 			}
 		}
 
+		/// <summary>
+		/// Retrieves a MPQHash object by filename.
+		/// </summary>
+		/// <param name="Filename">Filename of the hash to be retrieved.</param>
+		/// <returns>A MPQHash object containing information about the file including BlockIndex.</returns>
 		public MPQHash GetHashByFilename(string Filename) {
 			uint IndexHash = MPQUtilities.HashString(Filename, 0);
 			uint Name1 = MPQUtilities.HashString(Filename, 0x100);
