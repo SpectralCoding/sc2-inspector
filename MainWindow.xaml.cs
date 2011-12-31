@@ -26,7 +26,11 @@ namespace SC2Inspector {
 		}
 
 		private void Window_Loaded(object sender, RoutedEventArgs e) {
-			MasterIVM.ReplayViewModel.LoadReplay(@"E:\Programming\C#\111228 SC2Inspector\{Support\Replays\2010-07-29_mouzhasu(P)_liquidtlo(T)_metalopolis_[sc2-replays-net].SC2Replay");
+			MasterIVM.LoadReplay(@"E:\Programming\C#\111228 SC2Inspector\{Support\Replays\(Z)LiquidSheth_vs_(T)EGPuMa__2011-12-30_11217.sc2replay");
+			//MasterIVM.LoadReplay(@"E:\Programming\C#\111228 SC2Inspector\{Support\Replays\(T)mouzThorZaiN_vs_(T)EGPuMa__2011-12-30_11194.sc2replay");
+			//MasterIVM.LoadReplay(@"E:\Programming\C#\111228 SC2Inspector\{Support\Replays\(Z)EGIdrA_vs_(T)EGPuMa__2011-12-30_11201.sc2replay");
+			//MasterIVM.LoadReplay(@"E:\Programming\C#\111228 SC2Inspector\{Support\Replays\(P)LiquidHerO_vs_(P)MouzHasuObs__2011-12-30_11213.sc2replay");
+			//MasterIVM.LoadReplay(@"E:\Programming\C#\111228 SC2Inspector\{Support\Replays\Callahan\110629 Semi-Fail Drop TvP Double Expand Rape.SC2Replay");
 		}
 
 		private void OpenReplayBtn_Click(object sender, RoutedEventArgs e) {
@@ -37,7 +41,7 @@ namespace SC2Inspector {
 			Nullable<bool> OpenResult = OpenDiag.ShowDialog();
 			if (OpenResult == true) {
 				string Filename = OpenDiag.FileName;
-				MasterIVM.ReplayViewModel.LoadReplay(Filename);
+				MasterIVM.LoadReplay(Filename);
 			}
 		}
 	}

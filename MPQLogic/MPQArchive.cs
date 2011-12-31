@@ -7,6 +7,7 @@ using System.IO;
 namespace SC2Inspector.MPQLogic {
 	class MPQArchive {
 		private Stream m_BaseStream;
+		private BinaryReader m_BinaryReader;
 		private MPQHeader m_MPQHeader;
 		private MPQHashTable m_MPQHashTable;
 		private MPQBlockTable m_MPQBlockTable;
@@ -18,21 +19,50 @@ namespace SC2Inspector.MPQLogic {
 		public MPQArchive(string Filename) {
 			m_BaseStream = File.Open(Filename, FileMode.Open, FileAccess.Read);
 			m_MPQHeader = GetMPQHeader();
-			BinaryReader BinaryReader = new BinaryReader(m_BaseStream);
-			m_MPQHashTable = GetMPQHashTable(BinaryReader);
-			m_MPQBlockTable = GetMPQBlockTable(BinaryReader);
+			m_BinaryReader = new BinaryReader(m_BaseStream);
+			m_MPQHashTable = GetMPQHashTable(m_BinaryReader);
+			m_MPQBlockTable = GetMPQBlockTable(m_BinaryReader);
+			ExtractFiles();
+		}
+
+		public void ExtractFiles() {
+			#region Extract (listfile) and (attributes)
+			MPQBlock TempBlock = GetFile("(listfile)");
+			MPQHash TempHash = m_MPQHashTable.GetHashByFilename("(listfile)");
+			m_MPQBlockTable.Remove(TempHash.BlockIndex);
+			m_MPQBlockTable.Add("(listfile)", TempBlock);
+			TempBlock = GetFile("(attributes)");
+			TempHash = m_MPQHashTable.GetHashByFilename("(attributes)");
+			m_MPQBlockTable.Remove(TempHash.BlockIndex);
+			m_MPQBlockTable.Add("(attributes)", TempBlock);
+			#endregion
+			TempBlock = m_MPQBlockTable["(listfile)"];
+			string[] ListFileSplit = System.Text.UTF8Encoding.UTF8.GetString(TempBlock.RawContents).Split(new string[1] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+			foreach (string CurrentListFileEntry in ListFileSplit) {
+				TempBlock = GetFile(CurrentListFileEntry);
+				TempHash = m_MPQHashTable.GetHashByFilename(CurrentListFileEntry);
+				m_MPQBlockTable.Remove(TempHash.BlockIndex);
+				m_MPQBlockTable.Add(CurrentListFileEntry, TempBlock);
+			}
 		}
 
 		/// <summary>
 		/// Populates an MPQBlock with the decrypted data for the file.
 		/// </summary>
 		/// <param name="Filename">Internal MPQ filename (such as "(listfile)" or "replay.game.events").</param>
-		/// <param name="BinaryReader">BinaryReader used to manipulate the data stream.</param>
-		public void GetFile(string Filename, BinaryReader BinaryReader) {
-			BinaryReader.BaseStream.Seek(0, SeekOrigin.Begin);
-			MPQHash FileHash = m_MPQHashTable.GetHashByFilename(Filename);
-			MPQBlock FileBlock = (MPQBlock)m_MPQBlockTable[FileHash.BlockIndex];
-			FileBlock.PopulateFileContents(BinaryReader, m_MPQHeader.BlockSize);
+		/// 
+		public MPQBlock GetFile(string Filename) {
+			if (m_MPQBlockTable.ContainsKey(Filename)) {
+				return m_MPQBlockTable[Filename];
+			} else {
+				m_BinaryReader.BaseStream.Seek(0, SeekOrigin.Begin);
+				MPQHash FileHash = m_MPQHashTable.GetHashByFilename(Filename);
+				MPQBlock FileBlock = m_MPQBlockTable[FileHash.BlockIndex];
+				if (FileBlock.RawContents == null) {
+					FileBlock.PopulateFileContents(m_BinaryReader, m_MPQHeader.BlockSize);
+				}
+				return FileBlock;
+			}
 		}
 
 		/// <summary>

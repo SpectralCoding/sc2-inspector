@@ -5,10 +5,17 @@ using System.Text;
 
 namespace SC2Inspector.ViewModel {
 	public class InspectorViewModel : ViewModelBase {
-		public ReplayViewModel ReplayViewModel;
+		public List<ReplayViewModel> ReplayList = new List<ReplayViewModel>();
 
 		public InspectorViewModel() {
-			ReplayViewModel = new ReplayViewModel();
+			
 		}
+
+		public void LoadReplay(string Filename) {
+			ReplayViewModel tempRVM = new ReplayViewModel();
+			tempRVM.LoadReplay(Filename);
+			ReplayList.Add(tempRVM);
+		}
+
 	}
 }

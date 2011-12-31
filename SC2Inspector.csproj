@@ -64,8 +64,10 @@
     <Compile Include="MPQLogic\MPQHash.cs" />
     <Compile Include="MPQLogic\MPQHashTable.cs" />
     <Compile Include="MPQLogic\MPQHeader.cs" />
-    <Compile Include="MPQLogic\MPQUtilities.cs" />
+    <Compile Include="ReplayLogic\ReplayDetails.cs" />
+    <Compile Include="Utilities\MPQ.cs" />
     <Compile Include="ReplayLogic\Replay.cs" />
+    <Compile Include="Utilities\LowLevel.cs" />
     <Compile Include="ViewModel\ReplayViewModel.cs" />
     <Compile Include="ViewModel\InspectorViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />

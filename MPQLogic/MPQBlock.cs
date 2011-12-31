@@ -7,6 +7,7 @@ using System.IO;
 using ICSharpCode.SharpZipLib.BZip2;
 using ICSharpCode.SharpZipLib.GZip;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
+using SC2Inspector.Utilities;
 
 namespace SC2Inspector.MPQLogic {
 	class MPQBlock {
@@ -19,7 +20,6 @@ namespace SC2Inspector.MPQLogic {
 		public byte[] RawContents { get; private set; }
 		private uint m_FileOffset;							// Relative to the header offset
 		internal uint FilePos { get; private set; }			// Absolute position in the file
-		private uint[] BlockPositions;
 
 		public bool IsCompressed { get { return (Flags & MPQFileFlags.Compressed) != 0; } }
 		public bool IsEncrypted { get { return (Flags & MPQFileFlags.Encrypted) != 0; } }
@@ -79,7 +79,9 @@ namespace SC2Inspector.MPQLogic {
 					Decompressed = OutMemoryStream.ToArray();
 					break;
 				default:
-					throw new Exception("Unknown Compression Type.");
+					//throw new Exception("Unknown Compression Type.");
+					Decompressed = CompressedContents;
+					break;
 			}
 			return Decompressed;
 		}

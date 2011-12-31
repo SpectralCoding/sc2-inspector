@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using SC2Inspector.Utilities;
 
 namespace SC2Inspector.MPQLogic {
 	class MPQHeader {
@@ -20,7 +21,7 @@ namespace SC2Inspector.MPQLogic {
 		public ushort MPQVersion { get; private set; }
 		/// <summary>0Eh: int8 SectorSizeShift Power of two exponent specifying the number of 512-byte disk sectors in each logical sector in the archive. The size of each logical sector in the archive is 512 * 2^SectorSizeShift. Bugs in the Storm library dictate that this should always be 3 (4096 byte sectors).</summary>
 		public ushort BlockSize { get; private set; }
-		/// <summary>Should always read "Scarcraft II Replay 11</summary>
+		/// <summary>Should always read "Starcraft II Replay 11</summary>
 		public byte[] StarCraftII { get; private set; }
 		public int VersionMajor { get; private set; }
 		public int VersionMinor { get; private set; }
@@ -42,6 +43,7 @@ namespace SC2Inspector.MPQLogic {
 		public short HashTableOffsetHigh { get; private set; }
 		/// <summary>2Ah: int16 BlockTableOffsetHigh - High 16 bits of the block table offset for large archives.</summary>
 		public short BlockTableOffsetHigh { get; private set; }
+		public int GameLength { get; private set; }
 
 		public static readonly uint MPQId1A = 0x1A51504D;
 		public static readonly uint MPQId1B = 0x1B51504D;
@@ -58,34 +60,14 @@ namespace SC2Inspector.MPQLogic {
 				UserDataMaxSize = BinaryReader.ReadUInt32();
 				HeaderOffset = BinaryReader.ReadUInt32();
 				UserDataSize = BinaryReader.ReadUInt32();
-				int DataType = BinaryReader.ReadByte();							// Should be 0x05 (Array with Keys)
-				int NumberOfElements = MPQUtilities.ParseVLFNumber(BinaryReader);
-				int Index = MPQUtilities.ParseVLFNumber(BinaryReader);
-				DataType = BinaryReader.ReadByte();								// Should be 0x2 (Binary Data)
-				NumberOfElements = MPQUtilities.ParseVLFNumber(BinaryReader);
-				StarCraftII = BinaryReader.ReadBytes(NumberOfElements);
-				Index = MPQUtilities.ParseVLFNumber(BinaryReader);
-				DataType = BinaryReader.ReadByte();
-				NumberOfElements = MPQUtilities.ParseVLFNumber(BinaryReader);
-				int[] Version = new int[NumberOfElements];
-				while (NumberOfElements > 0) {
-					Index = MPQUtilities.ParseVLFNumber(BinaryReader);
-					DataType = BinaryReader.ReadByte();
-					if (DataType == 0x09) { Version[Index] = MPQUtilities.ParseVLFNumber(BinaryReader); }
-					else if (DataType == 0x06) { Version[Index] = BinaryReader.ReadByte(); }
-					else if (DataType == 0x07) { Version[Index] = BitConverter.ToInt32(BinaryReader.ReadBytes(4), 0); }
-					NumberOfElements--;
-				}
-				VersionMajor = Version[0];
-				VersionMinor = Version[1];
-				VersionPatch = Version[2];
-				VersionRevision = Version[3];
-				VersionBuild = Version[4];
-				// We end at position 68 (44h). There appears to be some data beyond this point?
-				// A possible option is below (multiple replays):
-				// 0409040609FE9E05 = 04-09 04-06 09-FE9E05
-				// 0409040609E88306 = 04-09 04-06 09-E88306
-				// 040904060996F403 = 04-09 04-06 09-96F403
+				SerializedData MPQ1BHeaderData = LowLevel.ParseSerializedData(BinaryReader);
+				StarCraftII = MPQ1BHeaderData.SerialData[0].ByteArrData;
+				VersionMajor = Convert.ToInt32(MPQ1BHeaderData.SerialData[1].SerialData[1].LongData);
+				VersionMinor = Convert.ToInt32(MPQ1BHeaderData.SerialData[1].SerialData[2].LongData);
+				VersionPatch = Convert.ToInt32(MPQ1BHeaderData.SerialData[1].SerialData[3].LongData);
+				VersionBuild = Convert.ToInt32(MPQ1BHeaderData.SerialData[1].SerialData[4].LongData);
+				GameLength = Convert.ToInt32(MPQ1BHeaderData.SerialData[3].LongData);
+				GameLength = Convert.ToInt32(Math.Ceiling(MPQ1BHeaderData.SerialData[3].LongData / 16.0));
 				BinaryReader.ReadBytes(Convert.ToInt32(HeaderOffset - BinaryReader.BaseStream.Position));
 			}
 			id = BinaryReader.ReadUInt32();

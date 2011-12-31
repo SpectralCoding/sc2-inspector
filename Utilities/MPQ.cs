@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace SC2Inspector.MPQLogic {
+namespace SC2Inspector.Utilities {
 
 	[Flags]
 	public enum MPQFileFlags : uint {
@@ -18,7 +18,7 @@ namespace SC2Inspector.MPQLogic {
 		Exists = 0x80000000
 	}
 
-	static class MPQUtilities {
+	static class MPQ {
 
 		public static uint[] StormBuffer;
 
@@ -112,30 +112,5 @@ namespace SC2Inspector.MPQLogic {
 			}
 			return Result;
 		}
-
-		public static int ParseVLFNumber(BinaryReader BinaryReader) {
-			var Bytes = 0;
-			var First = true;
-			var Number = 0;
-			var Multiplier = 1;
-			while (true) {
-				var i = BinaryReader.ReadByte();
-				Number += (i & 0x7F) * (int)Math.Pow(2, Bytes * 7);
-				if (First) {
-					if ((Number & 1) != 0) {
-						Multiplier = -1;
-						Number--;
-					}
-					First = false;
-				}
-				if ((i & 0x80) == 0) {
-					break;
-				}
-				Bytes++;
-			}
-			return (Number / 2) * Multiplier;
-		}
-
-
 	}
 }

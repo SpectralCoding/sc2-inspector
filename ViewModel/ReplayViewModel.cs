@@ -9,6 +9,7 @@ using SC2Inspector.MPQLogic;
 namespace SC2Inspector.ViewModel {
 	public class ReplayViewModel : ViewModelBase {
 		private Replay m_Replay;
+		private ReplayDetails m_ReplayDetails;
 		private MPQArchive m_MPQArchive;
 
 		public ReplayViewModel() {
@@ -18,6 +19,7 @@ namespace SC2Inspector.ViewModel {
 		public void LoadReplay(string Filename) {
 			m_Replay.Filename = Filename;
 			m_MPQArchive = new MPQArchive(Filename);
+			m_ReplayDetails = new ReplayDetails(m_MPQArchive.GetFile("replay.details"));
 		}
 
 	}
