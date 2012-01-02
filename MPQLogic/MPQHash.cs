@@ -5,7 +5,7 @@ using System.Text;
 using System.IO;
 
 namespace SC2Inspector.MPQLogic {
-	class MPQHash {
+	public class MPQHash {
 		public uint Name1 { get; private set; }
 		public uint Name2 { get; private set; }
 		public uint Locale { get; private set; }

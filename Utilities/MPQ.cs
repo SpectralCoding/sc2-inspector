@@ -18,7 +18,7 @@ namespace SC2Inspector.Utilities {
 		Exists = 0x80000000
 	}
 
-	static class MPQ {
+	public static class MPQ {
 
 		public static uint[] StormBuffer;
 

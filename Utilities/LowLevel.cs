@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace SC2Inspector.Utilities {
 
-	static class LowLevel {
+	public static class LowLevel {
 
 		// This was edited to use long instead of int. You can view the int version on r5.
 		[DebuggerStepThrough]

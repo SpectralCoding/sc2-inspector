@@ -6,7 +6,7 @@ using System.IO;
 using SC2Inspector.Utilities;
 
 namespace SC2Inspector.MPQLogic {
-	class MPQHeader {
+	public class MPQHeader {
 		// From http://wiki.devklog.net/index.php?title=The_MoPaQ_Archive_Format#Archive_Header :
 		/// <summary>00h: char(4) Magic - Indicates that the file is a MoPaQ archive. Must be ASCII "MPQ" 1Ah.</summary>
 		public uint Id { get; private set; }				// Signature. Should be 0x1a51504d

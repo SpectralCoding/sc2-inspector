@@ -7,7 +7,7 @@ using System.IO;
 using SC2Inspector.Utilities;
 
 namespace SC2Inspector.MPQLogic {
-	class MPQBlockTable : Hashtable {
+	public class MPQBlockTable : Hashtable {
 
 		public new MPQBlock this[object key] {
 			get { return (MPQBlock)base[key]; }

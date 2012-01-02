@@ -5,10 +5,10 @@ using System.Text;
 using System.IO;
 
 namespace SC2Inspector.MPQLogic {
-	class MPQArchive {
+	public class MPQArchive {
 		private Stream m_BaseStream;
 		private BinaryReader m_BinaryReader;
-		private MPQHeader m_MPQHeader;
+		public MPQHeader MPQHeader;
 		private MPQHashTable m_MPQHashTable;
 		private MPQBlockTable m_MPQBlockTable;
 
@@ -18,7 +18,7 @@ namespace SC2Inspector.MPQLogic {
 		/// <param name="Filename">Filename of the MPQ file to be opened</param>
 		public MPQArchive(string Filename) {
 			m_BaseStream = File.Open(Filename, FileMode.Open, FileAccess.Read);
-			m_MPQHeader = GetMPQHeader();
+			MPQHeader = GetMPQHeader();
 			m_BinaryReader = new BinaryReader(m_BaseStream);
 			m_MPQHashTable = GetMPQHashTable(m_BinaryReader);
 			m_MPQBlockTable = GetMPQBlockTable(m_BinaryReader);
@@ -59,7 +59,7 @@ namespace SC2Inspector.MPQLogic {
 				MPQHash FileHash = m_MPQHashTable.GetHashByFilename(Filename);
 				MPQBlock FileBlock = m_MPQBlockTable[FileHash.BlockIndex];
 				if (FileBlock.RawContents == null) {
-					FileBlock.PopulateFileContents(m_BinaryReader, m_MPQHeader.BlockSize);
+					FileBlock.PopulateFileContents(m_BinaryReader, MPQHeader.BlockSize);
 				}
 				return FileBlock;
 			}
@@ -82,9 +82,9 @@ namespace SC2Inspector.MPQLogic {
 		/// <param name="BinaryReader">BinaryReader used to manipulate the data stream.</param>
 		/// <returns>A MPQHashTable object containing the Hashtable information from the MPQ.</returns>
 		public MPQHashTable GetMPQHashTable(BinaryReader BinaryReader) {
-			m_BaseStream.Seek(m_MPQHeader.HashTablePos, SeekOrigin.Begin);
-			byte[] HashTableRawData = BinaryReader.ReadBytes(Convert.ToInt32(m_MPQHeader.HashTableSize) * 16);
-			return new MPQHashTable(HashTableRawData, Convert.ToInt32(m_MPQHeader.HashTableSize));
+			m_BaseStream.Seek(MPQHeader.HashTablePos, SeekOrigin.Begin);
+			byte[] HashTableRawData = BinaryReader.ReadBytes(Convert.ToInt32(MPQHeader.HashTableSize) * 16);
+			return new MPQHashTable(HashTableRawData, Convert.ToInt32(MPQHeader.HashTableSize));
 		}
 
 		/// <summary>
@@ -93,9 +93,9 @@ namespace SC2Inspector.MPQLogic {
 		/// <param name="BinaryReader">BinaryReader used to manipulate the data stream.</param>
 		/// <returns>A MPQBlockTable object containing the Block Table information from the MPQ.</returns>
 		public MPQBlockTable GetMPQBlockTable(BinaryReader BinaryReader) {
-			m_BaseStream.Seek(m_MPQHeader.BlockTablePos, SeekOrigin.Begin);
-			byte[] BlockTableRawData = BinaryReader.ReadBytes(Convert.ToInt32(m_MPQHeader.BlockTableSize) * 16);
-			return new MPQBlockTable(BlockTableRawData, Convert.ToInt32(m_MPQHeader.BlockTableSize), m_MPQHeader.HeaderOffset);
+			m_BaseStream.Seek(MPQHeader.BlockTablePos, SeekOrigin.Begin);
+			byte[] BlockTableRawData = BinaryReader.ReadBytes(Convert.ToInt32(MPQHeader.BlockTableSize) * 16);
+			return new MPQBlockTable(BlockTableRawData, Convert.ToInt32(MPQHeader.BlockTableSize), MPQHeader.HeaderOffset);
 		}
 
 	}

@@ -10,7 +10,7 @@ using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using SC2Inspector.Utilities;
 
 namespace SC2Inspector.MPQLogic {
-	class MPQBlock {
+	public class MPQBlock {
 
 		public uint CompressedSize { get; private set; }
 		public uint FileSize { get; private set; }
